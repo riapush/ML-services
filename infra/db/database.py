@@ -1,17 +1,33 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from config.settings import settings
+import logging
 
-# Подключение к базе данных
-SQLALCHEMY_DATABASE_URL = settings.database_url
+# Настройка логирования
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+DATABASE_URL = "postgresql://postgres:admin@localhost:5432/postgres"
 
+# Создаём Base
 Base = declarative_base()
 
-# Функция для получения сессии базы данных
+# После создания Base
+Base = declarative_base()
+
+# Явно импортируем и регистрируем модели
+def register_models():
+    from core.entities.user import User
+    from core.entities.prediction import Prediction
+    from core.entities.model import Model
+    return [User, Prediction, Model]
+
+models = register_models()
+
+# Создаём engine
+engine = create_engine(DATABASE_URL, echo=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:

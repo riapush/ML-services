@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 from core.entities.user import User
 
 class UserRepository(ABC):
@@ -7,7 +8,11 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def get_user_by_email(self, email: str) -> User:
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        pass
+
+    @abstractmethod
+    def get_user_by_id(self, user_id: int) -> Optional[User]:
         pass
 
     @abstractmethod
