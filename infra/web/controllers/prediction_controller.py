@@ -9,8 +9,14 @@ from .user_controller import get_current_user
 from core.entities.prediction import Prediction  # Add this import
 from core.entities.user import User  # Ensure this exists
 from infra.db.user_repository_impl import UserRepositoryImpl
+from fastapi import Security
+from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
+# Add security scheme to OpenAPI docs
+router.openapi_security = [{"Bearer": []}]
 
 class PredictionRequest(BaseModel):
     model_type: str  # "cheap", "medium" or "expensive"
@@ -22,33 +28,33 @@ class PredictionResponse(BaseModel):
     cost: int
     remaining_balance: int
 
-@router.post("/predict", response_model=PredictionResponse)
+@router.post("/predict",
+             response_model=PredictionResponse,
+             dependencies=[Security(get_current_user, scopes=["user"])])
 def make_prediction(
     request: PredictionRequest,
-    current_user: User = Depends(get_current_user),  # Add auth dependency
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     user_repo = UserRepositoryImpl(db)
     prediction_uc = PredictionUseCases(user_repo)
     
     try:
-        # Use the authenticated user's ID
         result = prediction_uc.make_prediction(
-            user_id=current_user.id,  # Use authenticated user's ID
+            user_id=current_user.id,  # Pass user ID instead of object
             model_type=request.model_type,
             input_data=request.input_data
         )
         
-        # Refresh user balance
-        db.refresh(current_user)
+        # Get updated balance
+        updated_user = user_repo.get_user_by_id(current_user.id)
         
         return {
             "prediction_id": result["prediction_id"],
             "result": result["output"],
             "cost": result["cost"],
-            "remaining_balance": current_user.balance
+            "remaining_balance": updated_user.balance
         }
-        
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

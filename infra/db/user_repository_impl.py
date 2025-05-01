@@ -36,7 +36,7 @@ class UserRepositoryImpl(UserRepository):
         try:
             user = self.db.query(User).filter(User.id == user_id).first()
             if user:
-                user.balance += amount
+                user.balance += amount  # Direct balance update
                 self.db.commit()
                 return True
             return False
@@ -49,3 +49,13 @@ class UserRepositoryImpl(UserRepository):
             .filter(Prediction.user_id == user_id)\
             .order_by(Prediction.created_at.desc())\
             .all()
+    
+    def save_prediction(self, prediction: Prediction) -> int:
+        try:
+            self.db.add(prediction)
+            self.db.commit()
+            self.db.refresh(prediction)
+            return prediction.id
+        except Exception as e:
+            self.db.rollback()
+            raise ValueError(f"Failed to save prediction: {str(e)}")

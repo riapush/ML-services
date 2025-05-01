@@ -12,9 +12,6 @@ DATABASE_URL = "postgresql://postgres:admin@localhost:5432/postgres"
 # Создаём Base
 Base = declarative_base()
 
-# После создания Base
-Base = declarative_base()
-
 # Явно импортируем и регистрируем модели
 def register_models():
     from core.entities.user import User
@@ -34,3 +31,4 @@ def get_db():
         yield db
     finally:
         db.close()
+

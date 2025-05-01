@@ -1,20 +1,13 @@
+from sqlalchemy import Column, Integer, String, JSON, DateTime, ForeignKey
+from infra.db.database import Base
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
 
 class Prediction(Base):
-    __tablename__ = 'predictions'
-    
+    __tablename__ = "predictions"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    model_type = Column(String, nullable=False)
-    input_data = Column(JSON, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"))  # Must match User's __tablename__
+    model_type = Column(String)
+    input_data = Column(JSON)
     output_data = Column(JSON)
-    cost = Column(Integer, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-    def execute(self, model):
-        self.output_data = model.predict(self.input_data)
-        return self.output_data
+    cost = Column(Integer)
+    created_at = Column(DateTime, default=datetime.utcnow)

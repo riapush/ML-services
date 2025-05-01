@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000'; // Update if your backend runs on a different port
+const API_BASE_URL = 'http://localhost:8000'
 let authToken = null;
 
 // DOM Elements
@@ -83,7 +83,7 @@ async function login(event) {
         loginButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging in...';
         
         // Perform login request
-        const response = await fetch(`${API_BASE_URL}/api/login`, {
+        const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -166,6 +166,7 @@ function hideAuthForms() {
 // Logout user
 function logout() {
     authToken = null;
+    localStorage.removeItem('authToken');
     userInfo.style.display = 'none';
     authButtons.style.display = 'block';
     predictionSection.style.display = 'none';
@@ -180,7 +181,7 @@ function logout() {
 // Load user data
 async function loadUserData() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/user`, {
+        const response = await fetch(`${API_BASE_URL}/user`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -204,7 +205,7 @@ async function loadUserData() {
 // Add money to user account
 async function addMoney() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/add_money`, {
+        const response = await fetch(`${API_BASE_URL}/add_money`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -285,7 +286,7 @@ async function loadHistory() {
     console.log("Current auth token:", authToken);  // Verify token exists
     
     try {
-        const response = await fetch(`${API_BASE_URL}/api/predictions_history`, {
+        const response = await fetch(`${API_BASE_URL}/predictions_history`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -403,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkAuthStatus() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/user`, {
+        const response = await fetch(`${API_BASE_URL}/user`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
@@ -450,7 +451,7 @@ async function loadHistory() {
 
     try {
         console.debug("Attempting to refresh history...");
-        const response = await fetch(`${API_BASE_URL}/api/predictions_history`, {
+        const response = await fetch(`${API_BASE_URL}/predictions_history`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,

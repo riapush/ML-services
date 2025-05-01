@@ -8,21 +8,19 @@ class PredictionUseCases:
         self.user_repo = user_repo
 
     def make_prediction(self, user_id: int, model_type: str, input_data: dict):
-        # Получаем модель
         model = self._get_model(model_type)
-        if not model:
-            raise ValueError("Invalid model type")
-        
-        # Получаем пользователя
         user = self.user_repo.get_user_by_id(user_id)
+        
         if not user:
             raise ValueError("User not found")
-        
-        # Проверяем баланс
         if user.balance < model.cost:
             raise ValueError("Not enough credits")
-        
-        # Создаем предсказание
+
+        # Update balance through repository method instead of user object
+        if not self.user_repo.update_user_balance(user_id, -model.cost):
+            raise ValueError("Balance update failed")
+
+        # Create and save prediction
         prediction = Prediction(
             user_id=user_id,
             model_type=model_type,
@@ -31,28 +29,20 @@ class PredictionUseCases:
             created_at=datetime.now()
         )
         
-        # Выполняем предсказание (заглушка)
-        output = self._execute_prediction(model, input_data)
-        
-        # Обновляем баланс
-        user.deduct_credits(model.cost)
-        self.user_repo.update_user(user)
-        
-        # Сохраняем предсказание
-        prediction.output_data = output
+        prediction.output_data = self._execute_prediction(model, input_data)
         prediction_id = self.user_repo.save_prediction(prediction)
         
         return {
             "prediction_id": prediction_id,
-            "output": output,
+            "output": prediction.output_data,
             "cost": model.cost
         }
     
     def _get_model(self, model_type: str):
         models = {
-            "cheap": Model(type="cheap", cost=10, accuracy=0.7),
-            "medium": Model(type="medium", cost=20, accuracy=0.85),
-            "expensive": Model(type="expensive", cost=50, accuracy=0.95)
+            "cheap": Model(type="cheap", cost=10),
+            "medium": Model(type="medium", cost=20),
+            "expensive": Model(type="expensive", cost=50)
         }
         return models.get(model_type)
     
@@ -61,7 +51,7 @@ class PredictionUseCases:
         # Пока используем заглушку
         return {
             "prediction": f"Result from {model.type} model",
-            "confidence": model.accuracy,
+            "confidence": 0,
             "input_processed": input_data
         }
     

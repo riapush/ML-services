@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from core.entities.prediction import Prediction
 from core.entities.user import User
 
 class UserRepository(ABC):
@@ -17,4 +18,8 @@ class UserRepository(ABC):
 
     @abstractmethod
     def update_user_balance(self, user_id: int, amount: int) -> bool:
+        pass
+
+    @abstractmethod
+    def save_prediction(self, prediction: Prediction) -> int:
         pass
