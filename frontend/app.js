@@ -477,5 +477,26 @@ async function loadHistory() {
     }
 }
 
+function showToast(message, type = 'info') {
+    const toastEl = document.getElementById('liveToast');
+    const toastBody = toastEl.querySelector('.toast-body');
+    
+    // Remove previous type classes
+    toastEl.classList.remove('text-bg-primary', 'text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    
+    // Add type-specific styling
+    const typeClasses = {
+      success: 'text-bg-success',
+      error: 'text-bg-danger',
+      warning: 'text-bg-warning',
+      info: 'text-bg-primary'
+    };
+    toastEl.classList.add(typeClasses[type] || 'text-bg-primary');
+  
+    toastBody.textContent = message;
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+  }
+
 // Call this when your app initializes
 document.addEventListener('DOMContentLoaded', initializeEventListeners);

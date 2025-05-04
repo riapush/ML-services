@@ -1,7 +1,6 @@
 from passlib.context import CryptContext
 from core.entities.user import User
 from core.repositories.user_repository import UserRepository
-from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

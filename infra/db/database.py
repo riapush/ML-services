@@ -16,8 +16,8 @@ Base = declarative_base()
 def register_models():
     from core.entities.user import User
     from core.entities.prediction import Prediction
-    from core.entities.model import Model
-    return [User, Prediction, Model]
+    from core.entities.model import CheapModel, MediumModel, ExpensiveModel
+    return [User, Prediction, CheapModel, MediumModel, ExpensiveModel]
 
 models = register_models()
 

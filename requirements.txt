@@ -5,3 +5,7 @@ psycopg2-binary
 pydantic
 passlib
 python-dotenv
+nltk
+openai
+bcrypt
+PyJWT
